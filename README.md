@@ -12,6 +12,10 @@ mkvirtualenv jekyll-in-toto-demo
 # Install in-toto
 pip install in-toto
 
+# Clone this repo
+https://github.com/lukpueh/demo-jekyll.git
+cd demo-jekyll
+
 # Run demo script
 ./run-demo.sh
 
@@ -23,9 +27,17 @@ pip install in-toto
 # Create virtual environment, e.g.:
 mkvirtualenv jekyll-grafeas
 
-# install grafeas fork
-pip install git+https://github.com/in-toto/totoify-grafeas
+# Install grafeas fork develop mode (the setup.py needs some fixing)
+git clone https://github.com/in-toto/totoify-grafeas --recursive
+cd totoify-grafeas
+pip install -e .
+cd ..
 
+# Clone this repo
+git clone https://github.com/lukpueh/demo-jekyll.git
+cd demo-jekyll
+
+# Run demo
 ./run-grafeas-demo.sh
 
 # Check output
