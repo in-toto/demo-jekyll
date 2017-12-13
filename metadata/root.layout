@@ -1,0 +1,118 @@
+{"signed": {
+    "_type": "layout",
+    "expires": "2020-05-18T14:17:56Z",
+    "inspect": [],
+    "keys": {
+        "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21": {
+            "keyid": "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21",
+            "keyid_hash_algorithms": [
+                "sha256",
+                "sha512"
+            ],
+            "keytype": "rsa",
+            "keyval": {
+                "private": "",
+                "public": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxoK1dIPqzvgBVEoA9JJU\nMqrvo0h1er5iI3i8Zsv7d2/Zr7kiNY0rwgUy2HOWR8I9GrfezwSQdPfe+1ALXe56\nhwAYm71oCsQ4TTTcf08TXntoXvNGeN+P3SsKJ6iw6HcYHyiqMuW8lpnDfd4mEPSe\nuv4ejNZzRHaMj1j9BX2Xi5lfEasLfsfKGdDhaOjsQm7Z1x5ONJFCeljtmr8FyiXV\n/0g2wUpa5nwdNYI9+DCorlvWV3z2xqotxzc5dfgGUN7Mz0MZP/qxNAEXV9cLNoQH\n5ijZUsCBnEbzg61HG9Dhw+TSDPKoz2MbRE0ick34YqdAqfGDfRDcOIQAG93guE1m\nle2/ZvP6VWdfPSPPXsRaKGUzxLlU7A5kPBhIcRzq6r2LoCVocT5b30XsaFuKzIrD\nF//k5sgu/hN5XCsWlp+p8h76h12IesPCTz7vFv6Em5aJvrOwkzUOR+Esn5aPjHij\nHvuH/RBcU8vJPEd0M6lcSg+OCOZ43nUUEQpqdHPaAiiNAgMBAAE=\n-----END PUBLIC KEY-----"
+            },
+            "scheme": "rsassa-pss-sha256"
+        }
+    },
+    "readme": "",
+    "steps": [
+        {
+            "_type": "step",
+            "expected_command": [
+                "git",
+                "tag",
+                "v1.0"
+            ],
+            "expected_materials": [],
+            "expected_products": [],
+            "name": "tag",
+            "pubkeys": [
+                "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21"
+            ],
+            "threshold": 1
+        },
+        {
+            "_type": "step",
+            "expected_command": [
+                "jekyll",
+                "build"
+            ],
+            "expected_materials": [
+                [
+                    "MATCH",
+                    "*",
+                    "WITH",
+                    "PRODUCTS",
+                    "FROM",
+                    "tag"
+                ]
+            ],
+            "expected_products": [],
+            "name": "build",
+            "pubkeys": [
+                "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21"
+            ],
+            "threshold": 1
+        },
+        {
+            "_type": "step",
+            "expected_command": [
+                "htmlproofer",
+                "_site/"
+            ],
+            "expected_materials": [
+                [
+                    "ALLOW",
+                    "_site/*"
+                ],
+                [
+                    "ALLOW",
+                    ".sass-cache/*"
+                ],
+                [
+                    "MATCH",
+                    "*",
+                    "WITH",
+                    "PRODUCTS",
+                    "FROM",
+                    "tag"
+                ]
+            ],
+            "expected_products": [],
+            "name": "test",
+            "pubkeys": [
+                "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21"
+            ],
+            "threshold": 1
+        },
+        {
+            "_type": "step",
+            "expected_command": [
+                "docker",
+                "build",
+                "-t",
+                "jekyll-demo",
+                "."
+            ],
+            "expected_materials": [
+                [
+                    "MATCH",
+                    "*",
+                    "WITH",
+                    "PRODUCTS",
+                    "FROM",
+                    "build"
+                ]
+            ],
+            "expected_products": [],
+            "name": "dockerize",
+            "pubkeys": [
+                "b17688a63948f71ea4f1bf4735784cf050957820b0a249014de18dc7422c9f21"
+            ],
+            "threshold": 1
+        }
+    ]
+}, "signatures": [{"keyid":"1ac2ad01ec1a198a9c705a4b4c80afe7ddda1f0cf9d3d3c1e3b3327b3b9fb979","sig":"c5e28627c0eb7341a1d2c8f9b737ac06ab4cb2d1e1c1a6cc1c3452ef8e3871689c69c6b85c9c55002c5bec1ce7689dd350bf83f5aaa0da15d4c351c0d91b06c9365e11a6bac473420cffd76edb9c518de5c55618e4d987900643250b35b0316065cbc0f98b3d36ae7519ae11aa20130aeaf4c3f22fdf6f1453937a5f14ef9f7d6eb47a38d949414d5a2227453b0bcea444765edb1beb0cf29d57617f33c094f0e3d553b2edb617948c1bc94fdfd166e7a87f9a814ca7bc74be21b377d92a6bd54446fba5ed0cdb440e6448803d5b2e382d19f4ecef68684174273f7783f64984c109b3663b4f6f0c6d059f79fbc0e689ae8d0ac111404c85ccf74d710ad0260ae221929c4e833c00e0675a09cc10d582e02f92c6783c08eee2f40171bd3ef10569f1cb989c673dc3d52d32b3872695f00e9b1017a9aa1a028f9ff38cb8cd0ffded053a43bb9243b60d558f70d25454c83dabcf61a7683fdcca239ae2c8b01404313becd3619b7accb2794532377368623325d3333495e6ac41b855e6f2cc4e37"}]}
