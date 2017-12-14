@@ -1,49 +1,132 @@
-# in-toto jekyll demo
+# in-toto grafeas jekyll demo
 
-Metadata and scripts to secure a basic jekyll supply chain with in-toto and
-grafeas.
+This demo walks through a simple software supply chain for a website generated
+with *jekyll* using [*in-toto*](https://in-toto.io) and
+[*grafeas*](https://grafeas.io/) to provide integrity and authenticity
+verification. The basic supply chain consists of the following steps:
+1. Tag the release of the jekyll project using *git*
+1. Build the static webpages with *jekyll*
+1. Test the build with *htmlproofer*
+1. Package the build into a *docker* image
 
-## Basic in-toto demo
+In order to guarantee the integrity of the resulting final product the commands
+required to perform these steps are wrapped with the in-toto-grafeas client.
+As a consequence each command produces metadata. This metadata contains
+information about the used files before and after a step command is executed
+and is signed by a [key](metadata/functionary) and published on the grafeas
+demo server as *occurrences*.
 
+This occurrence metadata allows to verify that only the given steps were
+performed and only by the authorized actors, according to a
+[project definition](metadata/root.layout), which is also published on the
+grafeas demo server as *operation*.
+
+
+### Requirements
+The demo requires the following software to be installed on your system: [Git](https://git-scm.com/), [Python 2.7](https://www.python.org/downloads/) ([virtualenvwrapper](http://virtualenvwrapper.readthedocs.io/en/latest/)), [Ruby](https://www.ruby-lang.org) ([jekyll](https://jekyllrb.com/), [HTMLproofer](https://github.com/gjtorikian/html-proofer)) and [Docker](https://www.docker.com).
+
+### Demo commands
+#### Prepare workspace
 ```shell
-# Create virtual environment, e.g.:
-mkvirtualenv jekyll-in-toto-demo
-
-# Install in-toto
-pip install in-toto
-
-# Clone this repo
-https://github.com/lukpueh/demo-jekyll.git
+# Clone this repo recursively and change into it
+git clone https://github.com/lukpueh/demo-jekyll.git --recursive
 cd demo-jekyll
 
-# Run demo script
-./run-demo.sh
+# Create a python virtualenvironment, e.g.
+mkvirtualenv supply-chain-demo
 
-# Check output
+# Install in-toto-grafeas client in develop mode
+pip install -e repos/totoify-grafeas
+
+# Assign some variables to reduce typing effort
+f_key="$(pwd)/metadata/functionary"
+o_pubkey="$(pwd)/metadata/owner.pub"
+layout="$(pwd)/metadata/root.layout"
+docker_image="jekyll-demo"
+project_id="demo-$(date +%s)"
+target="http://grafeas.nyu.wtf/v1alpha1/projects/${project_id}"
+
+# Clone the jekyll demo project repo and change into it
+git clone repos/demo-project-jekyll project
+cd project
 ```
 
-## in-totoized grafeas demo
+#### Upload supply chain layout to grafeas server
 ```shell
-# Create virtual environment, e.g.:
-mkvirtualenv jekyll-grafeas
+grafeas-load -i $project_id -l $layout
+```
 
-# Install grafeas fork develop mode (the setup.py needs some fixing)
-git clone https://github.com/in-toto/totoify-grafeas --recursive
-cd totoify-grafeas
-pip install -e .
-cd ..
+#### Execute supply chain steps
+Run supply chain steps while creating in-toto metadata and pushing it to the
+grafeas server
 
-# Clone this repo
-git clone https://github.com/lukpueh/demo-jekyll.git
-cd demo-jekyll
+##### Step 1. - Git tag the project
+```shell
+# 1. tag
+grafeas-run -i $project_id -k $f_key -n tag -p . -- git tag v1.0
+```
 
-# Run demo
-./run-grafeas-demo.sh
+##### Step 2. - Build the sources with jekyll
+```shell
+grafeas-run -i $project_id -k $f_key -n build -m . -p _site -- jekyll build
+```
 
-# Check output
+##### Step 3. - Test the build with htmlproofer
+```shell
+grafeas-run -i $project_id -k $f_key -n test -m . -- htmlproofer _site/
+```
+
+##### Step 4. - Package the build with docker
+```shell
+grafeas-run -i $project_id -k $f_key -n dockerize -m _site -- docker build -t ${docker_image} .
 ```
 
 
-## TODO:
-- Write this document
-- Clean up scripts
+#### Verify the supply chain
+Verify supply chain using the project's metadata from the grafeas server
+```shell
+grafeas-verify -i $project_id -k $o_pubkey
+```
+By the way, you can check out all the metadata you generated on the grafeas
+server using the following commands:
+```shell
+curl ${target}/operations
+curl ${target}/occurrences
+```
+
+You can safely spin up the docker container and visit your website at
+[http://localhost:4001](http://localhost:4001)
+```shell
+docker run --rm -d -p 4001:80 -t ${docker_image}
+# Stop and remove container with
+docker stop $(docker ps --filter "ancestor=${docker_image}" -q)
+```
+
+#### Attack supply chain (verification will fail)
+
+First we have to remove the earlier created files from the demo project repo
+and remove the build metadata from the grafeas server
+```shell
+git clean -fdx
+curl -X "DELETE" ${target}/occurrences/build-b17688a6
+```
+
+Then we sneak in some malicious contents before the build step and rebuild
+creating and publishing new metadata
+```shell
+echo "something really malicious" >> index.html
+grafeas-run -i $project_id -k $f_key -n build -m . -p _site -- jekyll build
+```
+
+Now, if we run verification it will fail because the `index.html` file that
+went into the `build` step doesn't match the file that came out of the
+`tag` step, which means the sneaky malicious code insertion was detected.
+```shell
+grafeas-verify -i $project_id -k $o_pubkey
+```
+
+#### Cleanup
+Before you run the demo again you should remove the `project` directory. Also
+make sure to update the `project_id` and `target` variable that you assigned
+in the beginning, so that you don't get "XYZ already exists on the grafeas
+server" errors.
