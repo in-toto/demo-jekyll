@@ -29,7 +29,7 @@ The demo requires the following software to be installed on your system: [Git](h
 #### Prepare workspace
 ```shell
 # Clone this repo recursively and change into it
-git clone https://github.com/lukpueh/demo-jekyll.git --recursive
+git clone https://github.com/in-toto/demo-jekyll.git --recursive
 cd demo-jekyll
 
 # Create a python virtualenvironment, e.g.
@@ -47,7 +47,7 @@ project_id="demo-$(date +%s)"
 target="http://grafeas.nyu.wtf/v1alpha1/projects/${project_id}"
 
 # Clone the jekyll demo project repo and change into it
-git clone repos/demo-project-jekyll project
+git clone https://github.com/in-toto/demo-project-jekyll.git project
 cd project
 ```
 

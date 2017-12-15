@@ -51,7 +51,7 @@ functionary_key="$(pwd)/metadata/functionary"
 layout_pubkey="$(pwd)/metadata/owner.pub"
 layout_path="$(pwd)/metadata/root.layout"
 git_repo_name="demo-project-jekyll"
-git_repo_url="https://github.com/lukpueh/${git_repo_name}.git"
+git_repo_url="https://github.com/in-toto/${git_repo_name}.git"
 docker_image_name="jekyll-demo"
 
 if [[ ! (-e ${functionary_key} && -e ${layout_pubkey} \

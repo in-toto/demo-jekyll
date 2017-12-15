@@ -29,7 +29,7 @@ echo "Project ID: ${project_id}"
 
 grafeas-load --id $project_id --layout $layout
 
-git clone https://github.com/lukpueh/${git_demo_name}.git
+git clone https://github.com/in-toto/${git_demo_name}.git
 cd ${git_demo_name}
 
 grafeas-run --id $project_id -k $key --name tag --products . -- git tag v1.0

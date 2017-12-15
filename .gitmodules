@@ -1,6 +1,3 @@
 [submodule "repos/totoify-grafeas"]
 	path = repos/totoify-grafeas
 	url = https://github.com/in-toto/totoify-grafeas.git
-[submodule "repos/demo-project-jekyll"]
-	path = repos/demo-project-jekyll
-	url = https://github.com/lukpueh/demo-project-jekyll.git
