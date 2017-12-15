@@ -130,3 +130,23 @@ Before you run the demo again you should remove the `project` directory. Also
 make sure to update the `project_id` and `target` variable that you assigned
 in the beginning, so that you don't get "XYZ already exists on the grafeas
 server" errors.
+
+
+
+### Demo script
+There is a demo script that runs above commands in two flavors. Just run
+one of the following commands from within this repo and make sure that you
+have the in-toto grafeas client installed.
+
+```shell
+# Publishes layout, runs supply chain commands generating/publishing metadata
+# and verifies the final product (passing verification)
+./run-demo.sh
+```
+
+```shell
+# Publishes layout, runs supply chain commands generating/publishing metadata,
+# sneaks in malicious content between the tag and build step and verifies
+# the final product (failing verification)
+./run-demo.sh attack
+```
